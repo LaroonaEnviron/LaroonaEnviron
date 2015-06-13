@@ -1,0 +1,162 @@
+\documentclass[a4paper, titlepage, 12pt]{article}
+%\documentclass[nohyper,justified]{tufte-handout}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{paralist}
+%\usepackage[usenames,dvipsnames]{color}
+\usepackage{ulem}
+\usepackage[round]{natbib}
+\usepackage[titletoc, title]{appendix}
+\newcommand{\HRule}{\rule{\linewidth}{2.0mm}}
+
+% insert here the call for the packages your document requires
+\usepackage{latexsym}
+\usepackage{url}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor    = black %Colour of citations
+}
+
+%**********************************************************************
+% redefine thebibliography environment
+
+\makeatletter
+\renewenvironment{thebibliography}[1]
+     {\section{\bibname}% <-- this line was changed from \chapter* to \section*
+      \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+\makeatother
+
+%***********************************************************************
+
+\begin{document}
+\begin{sffamily}
+
+\bibliographystyle{agsm}
+
+\begin{titlepage}
+\begin{center}
+
+% Title\
+\color{blue}
+\HRule \\[0.5cm]
+\color{black}
+{ \huge \bfseries Estimation\\of\\Irrigation Accession Volumes\\for\\the Berri, Cobdogla, Renmark and Chaffey Irrigation Districts\\[0.5cm]}
+\color{green}
+\HRule \\[3.0cm]
+\color{black}
+
+% Author and supervisor
+\begin{center} \Large
+\textbf{Tony \textsc{Meissner}} \\[0.5cm]
+{\large \textbf{\today}}
+\end{center}
+
+\color{white}
+\HRule \\[2.0cm]
+\color{blue}
+\begin{flushright}
+\framebox[6.0cm]{
+\colorbox{yellow}{
+\begin{minipage}{0.35\textwidth} 
+\begin{flushleft}
+\small 
+  Laroona Environmetrics \\
+  PO Box 1102 \\
+  Loxton SA 5333 Australia \\ 
+  Tel.: +61 8 8587 6248\\
+  email: laroona.env01@bigpond.com
+\end{flushleft}
+\end{minipage}}
+}
+\end{flushright}
+\color{brown}
+\HRule \\[2mm]
+\color{black}
+\end{center}
+\end{titlepage}
+
+<<beginning, echo=F>>=
+opts_chunk$set(echo=FALSE, fig.path="../figures/", cache.path='../cache/', cache=TRUE, fig.width=13.0, fig.height=9, dev="pdf")
+load("../R/.RData")
+@
+
+\section{Introduction}
+
+\section{Description of data and methodology}
+
+\subsection{Irrigated Areas}
+
+\subsection{Irrigation Application Volumes}
+
+\subsection{Application Rate}
+
+\subsection{Irrigation Efficiency}
+
+\subsection{Rainfall}
+
+\section{Assumptions in Estimating Irrigation Efficiency and Application Rate}
+
+\subsection{Floodplain and Highland}
+
+\subsection{Miscellaneous Quantities}
+
+\section{Calculation of Accession Volumes}
+
+\section{Discussion}
+
+\subsection{Comments of Estimated Accession Volumes}
+
+\newpage
+%\section{References}
+\begin{thebibliography}{20}
+
+\bibitem[Adams and Meissner(2009)]{Adams2009} Adams, A. and Meissner, T (2009) How Efficient are We. Report prepared for Department For Water by PIRSA Rural Solutions andf Laroona Environmetrics, December 2009.
+
+\bibitem[Dastane(1978)]{Dastane} Dastane, N.G. (1978) Effective Rainfall.  FAO Irrigation and Drainage Paper 25. M-56 ISBN 92-5-100272-X  \url{http://www.fao.org/docrep/X5560E/X5560E00.htm}
+
+\bibitem[Meissner(2012)]{Meissner2012} Meissner, Tony 2012. Estimation of Accession Volumes of the Woolpunda Irrigation Areas. Report prepared for Department for Environment, Water and Natural Resources, Adelaide by Laroona Environmetrics, Loxton,  October 2012.
+
+\bibitem[Meissner(2011a)]{Meissner2011a} Meissner, Tony (2011) Estimation of Accession Volumes of the Loxton and Bookpurnong Irrigations Areas. Report prepared for Department for Water by Laroona Environmetrics, Loxton, February 2011.
+
+\bibitem[Meissner(2011b)]{Meissner2011b} Meissner, Tony (2011) Estimation of Accession Volumes of the Cadell, Qualco-Sunlands and Waikerie Irrigations Areas. Report prepared for Department for Water by Laroona Environmetrics, Loxton, November 2011.
+
+\bibitem[Meissner(2014)]{Meissner2014} Meissner, Tony (2014) Estimation of Irrigation Accession Volumes for the Lyrup, Pike and Murtho Districts. Report to Department of Environment, Water and Natural Resources by Laroona Environmetrics, Loxton, August 2014.
+
+\bibitem[Middlemis, Georgiou, and Richardson(2009)]{REM} Middlemis, H.,  Georgiou, J \& Richardson, S (2005) Pike River and Murtho Concept Design for Salt Interception Schemes, Groundwater Model.  Report prepared by Resource \& Environmental Management for the Department of Water Land and Biodiversity Conservation, August 2005
+
+\end{thebibliography}
+
+\newpage
+
+\newpage
+\begin{appendices}
+
+\end{appendices}
+
+\end{sffamily}
+\end{document}
