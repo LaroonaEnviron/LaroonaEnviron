@@ -19,6 +19,8 @@
 \usepackage{url}
 \usepackage{hyperref}
 
+\definecolor{brown}{rgb}{0.59, 0.29, 0.0}
+
 \hypersetup{
   colorlinks   = true, %Colours links instead of ugly boxes
   urlcolor     = blue, %Colour for external hyperlinks
@@ -102,12 +104,32 @@
 
 <<beginning, echo=F>>=
 opts_chunk$set(echo=FALSE, fig.path="../figures/", cache.path='../cache/', cache=TRUE, fig.width=13.0, fig.height=9, dev="pdf")
-load("../R/.RData")
+load(".RData")
 @
 
 \section{Introduction}
+The Department for Environment, Water and Natural Resources (DEWNR) contracted Laroona Environmetrics to review accessions\footnote{\footnotesize{\bfseries{Accessions} are defined as the volume of water draining beyond the rootzone of irrigated crops that eventually percolates to the groundwater. Accessions volumes are not necessarily equal to groundwater recharge volumes. The presence of aquitards, lateral spread of the accession front and water held in the geological layers above the aquifer are some factors that affect the recharge volume}} from irrigation applications to the regional groundwater in the Cobdogla, Berri, Renmark and Chaffey Irrigation Districts. The accessions are an input into the regional groundwater model for estimating salt loads to the River Murray. This study is similar to previous  studies undertaken for DEWNR and its predecessors \citep{Meissner2011a}, \citep{Meissner2011b}, \citep{Meissner2012}and \citep{Meissner2014}. The agreed tasks of the study were:
+
+\begin{itemize}
+  \item Review historical data on irrigated area, irrigation application rates, volume of irrigation water pumped, volumes of drainage water collected by the Comprehensive Drainage Schemes (CDS), rainfall data and irrigation efficiency values used to estimate accessions to the regional groundwater;
+  \item  Construct worksheets to estimate the volume of applied water draining beyond the root zone of irrigated crops for each of the irrigation districts;
+  \item Provide the spreadsheet of interim estimations of accessions for review by DEWNR groundwater modellers; and
+  \item Provide a report of the accession study.
+\end{itemize}
+
+The Berri -- Renmark groundwater model covers the Irrigation Trust Areas of Cobdogla,  Berri and Chaffey (Central Irrigation Trust (CIT)) and the Renmark Irrigation Trust Areas of Renamrk.  Figure \ref{fig01} shows the map of these irrigated districts.
+
+
+\begin{figure}
+\includegraphics[width=14.5cm, height=18.0cm]{"C:/Users/Tony/Laroona Consulting/IIM/Berri_Renmark/Berri-Renmark Irrigation Districts"}
+\label{fig01}
+\caption{Map of the Cobdogla, Berri, Renmark and Chaffey Irrigation Districts}
+\end{figure} 
 
 \section{Description of data and methodology}
+Two Microsoft Excel\textsuperscript{\textregistered} spreadsheet files were supplied containing the data for irrigated area and consumption (irrigation) volumes and years for which the data was measured or estimated. These data were then transferred to a new spreadsheet that contained templates for calculating the volume of accessions from the application of irrigation water to horticultural crops. Monthly rainfall data for Renmark Irrigation Office (Station ID=024003), Lyrup (Station ID=024008) and Berri (Station ID=24025) were downloaded from the Bureau of Meteorology (URL:\url{http://www.bom.gov.au/climate/data/index.shtml})
+
+Renmark Irrigation Trust provided four Excel\textsuperscript{\textregistered} files containing records of \textit{hours} drainage caisson pumps were operated, \textit{power consumption} and volumes pumped covering the period October 1998 to May 2015. In addition, scanned copies of respective pump rating curves for caisson pumps were also supplied.
 
 \subsection{Irrigated Areas}
 
