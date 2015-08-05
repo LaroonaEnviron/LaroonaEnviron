@@ -1,0 +1,203 @@
+\documentclass[a4paper, titlepage, 12pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+%\documentclass[nohyper,justified]{tufte-handout}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{paralist}
+%\usepackage[usenames,dvipsnames]{color}
+\usepackage{ulem}
+\usepackage[round]{natbib}
+\usepackage[titletoc, title]{appendix}
+\newcommand{\HRule}{\rule{\linewidth}{3.0mm}}
+
+% insert here the call for the packages your document requires
+\usepackage{latexsym}
+\usepackage{url}
+\usepackage{hyperref}
+
+\definecolor{brown}{rgb}{0.59, 0.29, 0.0}
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor    = black %Colour of citations
+}
+
+%**********************************************************************
+% redefine thebibliography environment
+
+\makeatletter
+\renewenvironment{thebibliography}[1]
+     {\section{\bibname}% <-- this line was changed from \chapter* to \section*
+      \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+\makeatother
+
+%***********************************************************************
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\begin{sffamily}
+
+\bibliographystyle{agsm}
+
+\begin{titlepage}
+\begin{center}
+
+% Title\
+\color{blue}
+\HRule \\ [0.5cm]
+\color{black}
+{ \huge \bfseries Estimation\\of\\Irrigation Accession Volumes\\for\\the Berri, Cobdogla, Renmark and Chaffey Irrigation Districts\\ [0.5cm]}
+\color{green}
+\HRule \\ [3.0cm]
+\color{black}
+
+% Author and supervisor
+\begin{center} \Large
+\textbf{Tony \textsc{Meissner}} \\ [0.5cm]
+{\large \textbf{\today}}
+\end{center}
+
+\color{white}
+\HRule \\ [2.0cm]
+\color{blue}
+\begin{flushright}
+\framebox[6.0cm]{
+\colorbox{yellow}{
+\begin{minipage}{0.35\textwidth}
+\begin{flushleft}
+\small
+  Laroona Environmetrics \\
+  PO Box 1102 \\
+  Loxton SA 5333 Australia \\
+  Tel.: +61 8 8587 6248 \\
+  email: laroona.env01@bigpond.com
+\end{flushleft}
+\end{minipage}}
+}
+\end{flushright}
+\color{brown}
+\HRule \\
+\color{black}
+\end{center}
+\end{titlepage}
+
+
+
+\section{Introduction}
+The Department for Environment, Water and Natural Resources (DEWNR) contracted Laroona Environmetrics to review accessions\footnote{\footnotesize{\bfseries{Accessions} are defined as the volume of water draining beyond the rootzone of irrigated crops that eventually percolates to the groundwater. Accessions volumes are not necessarily equal to groundwater recharge volumes. The presence of aquitards, lateral spread of the accession front and water held in the geological layers above the aquifer are some factors that affect the recharge volume}} from irrigation applications to the regional groundwater in the Cobdogla, Berri, Renmark and Chaffey Irrigation Districts. The accessions are an input into the regional groundwater model for estimating salt loads to the River Murray. This study is similar to previous  studies undertaken for DEWNR and its predecessors \citep{Meissner2011a, Meissner2011b, Meissner2012, Meissner2014}. The agreed tasks of the study were:
+
+\begin{itemize}
+  \item Review historical data on irrigated area, irrigation application rates, volume of irrigation water pumped, volumes of drainage water collected by the Comprehensive Drainage Schemes (CDS), rainfall data and irrigation efficiency values used to estimate accessions to the regional groundwater;
+  \item  Construct worksheets to estimate the volume of applied water draining beyond the root zone of irrigated crops for each of the irrigation districts;
+  \item Provide the spreadsheet of interim estimations of accessions for review by DEWNR groundwater modellers; and
+  \item Provide a report of the accession study.
+\end{itemize}
+
+The Berri -- Renmark groundwater model covers the Irrigation Trust Areas of Cobdogla,  Berri and Chaffey (Central Irrigation Trust (CIT)) and the Renmark Irrigation Trust Areas.  Figure \ref{fig01} shows the map of these irrigated districts.
+
+\begin{figure}
+\includegraphics[width=14.5cm, height=18.0cm]{"C:/Users/Tony/Laroona Consulting/IIM/Berri_Renmark/Berri-Renmark Irrigation Districts"}
+\label{fig01}
+\caption{Map of the Cobdogla, Berri, Renmark and Chaffey Irrigation Districts for which irrigation accessions were calcuated.}
+\end{figure}
+
+\section{Description of data and methodology}
+Two Microsoft Excel\textsuperscript{\textregistered} spreadsheet files were supplied containing data for irrigated areas and consumption (irrigation) volumes for years for which the data was measured or estimated (\textit{"Berri-Renmark\_Consumption\_CropArea\_data\_20150617.xlsx"}). These data were then transferred to a new spreadsheet that contained templates for calculating the volume of accessions from the application of irrigation water to horticultural crops. Monthly rainfall data for Renmark (Station ID=024003), Lyrup (Station ID=024008), Berri (Station ID=24025), Barmera (Station ID=24001), and Kingston-on-Murray (Station ID=24008) were downloaded from the Bureau of Meteorology (URL:\url{http://www.bom.gov.au/climate/data/index.shtml})
+
+Renmark Irrigation Trust provided four Excel\textsuperscript{\textregistered} files containing records of \textit{hours} drainage caisson pumps were operated, \textit{power consumption} and volumes pumped covering the period October 1998 to May 2015. In addition, scanned copies of respective pump rating curves for caisson pumps were also supplied.
+
+\newpage
+%\section{References}
+\begin{thebibliography}{20}
+
+\bibitem[Adams and Meissner(2009)]{Adams2009} Adams, A. and Meissner, T (2009) How Efficient are We. Report prepared for Department For Water by PIRSA Rural Solutions andf Laroona Environmetrics, December 2009.
+
+\bibitem[Dastane(1978)]{Dastane} Dastane, N.G. (1978) Effective Rainfall.  FAO Irrigation and Drainage Paper 25. M-56 ISBN 92-5-100272-X  \url{http://www.fao.org/docrep/X5560E/X5560E00.htm}
+
+\bibitem[Meissner(2012)]{Meissner2012} Meissner, Tony 2012. Estimation of Accession Volumes of the Woolpunda Irrigation Areas. Report prepared for Department for Environment, Water and Natural Resources, Adelaide by Laroona Environmetrics, Loxton,  October 2012.
+
+\bibitem[Meissner(2011a)]{Meissner2011a} Meissner, Tony (2011) Estimation of Accession Volumes of the Loxton and Bookpurnong Irrigations Areas. Report prepared for Department for Water by Laroona Environmetrics, Loxton, February 2011.
+
+\bibitem[Meissner(2011b)]{Meissner2011b} Meissner, Tony (2011) Estimation of Accession Volumes of the Cadell, Qualco-Sunlands and Waikerie Irrigations Areas. Report prepared for Department for Water by Laroona Environmetrics, Loxton, November 2011.
+
+\bibitem[Meissner(2014)]{Meissner2014} Meissner, Tony (2014) Estimation of Irrigation Accession Volumes for the Lyrup, Pike and Murtho Districts. Report to Department of Environment, Water and Natural Resources by Laroona Environmetrics, Loxton, August 2014.
+
+\bibitem[Middlemis, Georgiou, and Richardson(2009)]{REM} Middlemis, H.,  Georgiou, J \& Richardson, S (2005) Pike River and Murtho Concept Design for Salt Interception Schemes, Groundwater Model.  Report prepared by Resource \& Environmental Management for the Department of Water Land and Biodiversity Conservation, August 2005
+
+\end{thebibliography}
+
+\newpage
+
+
+\end{sffamily}
+\end{document}

@@ -1,0 +1,25 @@
+\documentclass{article}
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.markings}
+
+
+\tikzset{test/.style={
+		postaction={
+			decorate,
+			decoration={
+				markings,
+				mark=at position \pgfdecoratedpathlength-0.5pt with {\arrow[blue,line width=#1] {>}; },
+				mark=between positions 0 and \pgfdecoratedpathlength-8pt step 0.5pt with {
+					\pgfmathsetmacro\myval{multiply(divide(
+						\pgfkeysvalueof{/pgf/decoration/mark info/distance from start}, \pgfdecoratedpathlength),100)};
+					\pgfsetfillcolor{blue!\myval!red};
+					\pgfpathcircle{\pgfpointorigin}{#1};
+					\pgfusepath{fill};}
+			}}}}
+			
+\begin{document}
+  \begin{tikzpicture}[]
+	\path [test=2pt] (-1,-1) .. controls (9,-1) and (-7,1) .. (1,1);
+  \end{tikzpicture}
+\end{document}

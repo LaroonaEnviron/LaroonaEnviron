@@ -1,0 +1,91 @@
+\documentclass[a4paper, titlepage, 12pt]{article}
+%\documentclass[nohyper,justified]{tufte-handout}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{paralist}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{paralist}
+\usepackage{ulem}
+\usepackage[round]{natbib}
+
+\usepackage{booktabs}
+\usepackage{dcolumn}
+
+\usepackage[titletoc, title]{appendix}
+\newcommand{\HRule}{\rule{\linewidth}{3.0mm}}
+
+\definecolor{brown}{rgb}{0.60, 0.30, 0.01}
+
+% use TIKZ package
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
+
+% insert here the call for the packages your document requires
+\usepackage{latexsym}
+\usepackage{url}
+\usepackage{hyperref}
+
+\begin{document}
+\begin{sffamily}
+
+\begin{titlepage}
+\begin{center}
+
+% Title\
+\color{blue}
+\HRule \\ [0.5cm]
+\color{black}
+{ \huge \bfseries Estimation\\of\\Irrigation Accession Volumes\\for \\the Berri, Cobdogla, Renmark and Chaffey Irrigation Districts\\ [0.5cm]}
+\color{green}
+\HRule \\ [2.0cm]
+\color{black}
+
+% Author and supervisor
+\begin{center} \Large
+\textbf{Tony \textsc{Meissner}} \\ [0.5cm]
+{\large \textbf{\today}}
+\end{center}
+
+\color{white}
+\HRule \\ [1.0cm]
+\color{blue}
+\begin{flushright}
+
+% Define box and box title style
+\tikzstyle{mybox} = [draw=black, very thick, rectangle, rounded corners, 
+                    inner sep=10pt, inner ysep=15pt, shade=[left color=blue, right color=green]]
+%\tikzstyle{fancytitle} =[fill=red, text=white]
+
+  \begin{tikzpicture}
+    \node [mybox] (box){%
+		  \begin{minipage}{0.45\textwidth}
+        \begin{flushleft}
+          \small
+  Laroona Environmetrics \\
+  PO Box 1102 \\
+  Loxton SA 5333 Australia \\
+  Tel.: +61 8 8587 6248 \\
+  email: laroona.env01@bigpond.com
+       \end{flushleft}
+    \end{minipage}
+	};
+ 
+  \end{tikzpicture}
+\end{flushright}
+\color{brown}
+\HRule \\
+\color{black}
+\end{center}
+\end{titlepage}
+
+
+\end{sffamily}
+\end{document}

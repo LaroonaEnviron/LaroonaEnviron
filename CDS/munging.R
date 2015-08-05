@@ -20,27 +20,23 @@ for (i in 1:length(caissons)) {
     pause()
   }
 
-# aggregate pumphrs by month and caisson
-pumphrs.agg <- with(pumphrs, aggregate(hrs, by=list(substr(Date, 1,7), caisson),sum, na.rm=T))
-names(pumphrs.agg) <- c('month','caisson','hours')
-pumphrs.agg$month <- as.Date(paste(pumphrs.agg$month,'01',sep='-'), format="%Y-%m-%d")
-head(pumphrs.agg)
-
-mnthhrs <- with(pumphrs, aggregate(time, by=list(substr(Date, 1,7), caisson),sum, na.rm=T))
-head(mnthhrs, 20)
-
-# aggregate use by month and caisson
-mnthkwh <- with(use, aggregate(use, by=list(substr(Date, 1,7), caisson),sum, na.rm=T))
-names(mnthkwh) <- c('month','caisson','hours')
-mnthkwh$month <- as.Date(paste(mnthkwh$month,'01',sep='-'), format="%Y-%m-%d")
-head(mnthkwh, 20)
+caissons <- unique(Vol$caisson)
+for (i in 1:length(caissons)) {
+    print(xyplot(Vol~Date, groups=subcaiss, data=subset(Vol, caisson==caissons[i]), 
+    type='l', col=c('red','blue'), xlab="Year", ylab="Volume pumped (Ml)",    
+    main=paste("Caisson ", caissons[i])))
+    pause()
+  }
+  
+# plot year vs vol
+qplot(Date, vol, data=Vol, facets=~caisson, col=subcaiss, geom='line')
 
 #---------------------------------------------------------------------
 # aggregate pumphrs by year and caisson
 hrsyr <- with(pumphrs, aggregate(hrs, by=list(substr(Date, 1,4), caisson),sum, na.rm=T))
 names(hrsyr) <- c('year','caisson','cumhours')
 hrsyr$year <- as.integer(hrsyr$year)
-head(hrsyr)
+head(hrsyr, 20)
 
 timeyr <- with(pumphrs, aggregate(time, by=list(substr(Date, 1,4), caisson),sum, na.rm=T))
 names(timeyr) <- c('year','caisson','hours')
@@ -48,19 +44,38 @@ timeyr$year <- as.integer(timeyr$year)
 head(timeyr, 20)
 
 # aggregate use by year and caisson
-kwhyear <- with(use, aggregate(use, by=list(substr(Date, 1,4), caisson),sum, na.rm=T))
-names(kwhyear) <- c('year','caisson','hours')
-kwhyear$year <- as.integer(kwhyear$year)
-head(kwhyear, 20)
+Kwyear <- with(use, aggregate(use, by=list(substr(Date, 1,4), caisson),sum, na.rm=T))
+names(Kwyear) <- c('year','caisson','Kw')
+Kwyear$year <- as.integer(kwhyear$year)
+head(Kwyear, 20)
 
-nrow(timeyr); nrow(kwhyear)
+nrow(timeyr); nrow(Kwyear)
 
-caissdat <- data.frame(hrsyr[,], timeyr[,3], kwhyear[,3])
-names(caissdat)[4:5] <- c('hours','cumkwh')
+#  aggregate use by year and caisson
+annVol <- with(Vol, aggregate(Vol, by=list(substr(Date, 1,4), caisson),sum, na.rm=T))
+names(annVol) <- c('year','caisson','Ml')
+annVol$year <- as.integer(annVol$year)
+annVol$caisson <- as.numeric(annVol$caisson)
+annVol
+
+nrow(annVol)
+
+# merge yearly pump hours and electricity use
+caissdat <- data.frame(hrsyr[,], timeyr[,3], Kwyear[,3])
+names(caissdat)[4:5] <- c('hours','cumKw')
+caissdat$caisson <- factor(caissdat$caisson)
 head(caissdat)
 
-theme_set(theme_bw())
-qplot(hours, cumkwh, data=caissdat, facets=~caisson)
-qplot(year, cumkwh, data=caissdat, facets=~caisson)
+# merge yearly pump hours, electricity use and volume pumped
+df1 <- merge(annVol, timeyr)
+df1 <- df1[order(df1$caisson, df1$year),]
+head(df1, 50)
 
-  
+df2 <- merge(annVol, kwhyear)
+df2 <- df2[order(df2$caisson, df2$year),]
+head(df2, 50)
+
+df3 <- merge(df1, df2)
+df3 <- df3[order(df3$caisson, df3$year),]
+df3 <- subset(df3, Ml > 0)
+head(df3, 50)
