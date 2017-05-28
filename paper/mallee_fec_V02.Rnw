@@ -1,0 +1,488 @@
+\documentclass[a4paper, titlepage, 12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage[round]{natbib}
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+
+% insert here the call for the packages your document requires
+\usepackage{latexsym}
+\usepackage{url}
+\usepackage{hyperref}
+
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor    = black %Colour of citations
+}
+
+
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT}
+\SetWatermarkScale{1}
+
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+\begin{sffamily}
+
+<<setup, echo=FALSE>>=
+# set global chunk options
+opts_chunk$set(echo=FALSE, fig.path='graphs/', cache.path='cache/', concordance=TRUE)
+opts_chunk$set(cache=TRUE, fig.width=12.5, fig.height=8, fig.show='hold', warnings=FALSE, message=FALSE)
+options(warn=-1)
+
+require(rpart)
+require(DAAG)
+require(partykit)
+require(xlsx)                                                 
+require(xtable)
+require(ggplot2)
+require(reshape2)
+require(RColorBrewer)
+require(rpart.plot)
+require(reshape2)
+
+# read in major soil data file
+filein1 <- "../data/raw.xlsx"
+soils <- read.xlsx(filein1, 1, colClasses=c("integer","numeric","numeric","numeric","numeric","character","character","character","numeric","character","character","character","numeric","numeric","numeric","numeric","character"), colIndex=c(1:16,25), stringsAsFactors=FALSE)
+
+# read in file with soil names
+filein2 <- "../data/SOILLIB.xlsx"
+soilnames <- read.xlsx(filein2, 1, colClasses=c("integer","character"), colIndex=1:2, stringsAsFactors=FALSE)
+#getwd()
+
+# add names from soilnames to soils
+numVec <- match(soils$No, soilnames$No)
+soils$name <- soilnames[numVec, 2]
+
+# correct 'Loxton I A' to 'Loxton IA'
+soils$Location <- with(soils, ifelse(Location=="LOXTON I A", "LOXTON IA", soils$Location)) 
+
+# convert State, Location, Texture, Field.Texture, Field.CO3 & Site from character to factor in dataframe soils
+soils$State <- factor(soils$State)
+soils$Location <- factor(soils$Location)
+soils$Texture <- factor(soils$Texture)
+soils$Field.Texture <- factor(soils$Field.Texture)
+soils$Field.CO3 <- factor(soils$Field.CO3)
+soils$Region <- factor(soils$Region)
+
+# convert horizon to upper, lower depths
+hLst <- strsplit(soils$Horizon, '[-]')
+depths <- unlist(hLst)
+lVec <- (1:length(depths)) %% 2
+upper <- integer()
+lower <- integer()
+for (i in 1:length(depths)) {
+  if(lVec[i]) upper[i] <- depths[i] else lower[i] <- depths[i]
+  }
+
+# remove NA values
+upper <- upper[!is.na(upper)]
+lower <- lower[!is.na(lower)]
+soils$upper <- as.integer(upper)
+soils$lower <- as.integer(lower)
+
+Soils <- soils[,c(1:5,19:20,9:16,6:7,17)]
+rownames(Soils) <- soils[,18]
+
+# convert Texture, Field.Texture & Field.CO3 to ordered factors
+Soils$Texture <- factor(Soils$Texture, levels=c("SAND","LS","SL","LOAM","SCL","CL","CLAY"), ordered=T)
+Soils$Field.Texture <- factor(Soils$Field.Texture, levels=c("S","LS","SL","L","LSCL","SCL","CL","C"), ordered=T)
+Soils$Field.CO3 <- factor(Soils$Field.CO3, levels=,c("N","S","M","H","V"), ordered=T)
+
+# calculate RAW
+Soils$raw60 <- with(Soils, (KPa8 - KPa60)*1000)
+
+# extract the Mallee soils
+mallee <- subset(Soils, Region=="Riverland" | Region=="Sunraysia")
+mallee$Region <- factor(mallee$Region)
+mallee$Field.Texture <- factor(mallee$Field.Texture)
+@
+
+\bibliographystyle{agsm}      % basic style, author-year citations
+
+\begin{titlepage}
+
+\Large{\noindent Effect of field assessed textures and fine earth carbonates on water holding capacity of irrigated southern Australian Mallee soils} \\
+
+% if too long for running head
+\Large{\noindent  \underline{Short title:}Field Texture, Carbonates and water holding capacity of Mallee soils} 
+
+\noindent Mr. Tony Meissner  \\
+formerly: South Australian Research \& Development Institute, \\
+Loxton, SA 5333 Australia \\
+Tel.: +61 8 8587 6248\\
+email: laroona.env01@bigpond.com    \\
+PO Box 1102  \\
+
+\date{Received: date / Accepted: date}
+
+\end{titlepage}
+
+\textbf{Abstract}
+
+\textbf{keywords:} fine earth carbonate, readily available water, Mallee soils
+
+\newpage
+\section*{Introduction}
+Along the River Murray downstream of Swan Hill in Victoria most horticultural crops are irrigated on the highland soils above the river trench. The highland soils are predominately loamy sand and sandy loam at the surface increasing in texture grade at depth to light sandy clay loam to light -- medium clay. The soils become increasingly calcareous with depth ranging from finely divided carbonates -- fine earth carbonates (fec) --, small round limestone nodules (1 -- 15mm diameter), large stones (15 -- 100mm in length) and calcrete rocks/boulders (>150mm). The River Murray Irrigation and Salinity Investigation Program (RMISIP) in South Australia \citep{Cole85} was undertaken from 1970 to 1976 which investigated irrigation practices and soil salinity of the highland mallee horticultural enterprises. An outcome of the program was that before establishing new irrigation developments a soil survey of the land was required. The readily available water holding capacity (RAW) of the soil was calculated as the amount of water held between 8 and 60kPa suction. The RAW value of the rootzone of the irrigated crops was used in the design of the irrigation system that delivered water to areas where soils were similar in their RAW values. These areas were then irrigated to maintain the moisture content of the rootzone between field capacity (8kPa) and the refill point\footnote{The refill point is usually the amount of water retained in the soil at -60kPa suction}.\\
+
+The RMISIP research measured the soil moisture characteristics of the highland Mallee and Barossa and Adelaide Hills soils \citep{Cock84, Cock85}, a table of RAW values, laboratory measured and field(hand) assessed textures was constructed. As measuring the moisture release curve of soil samples was expensive and time consuming, soil survey practitioners used the field texture grades to determine the soil's RAW value using the above mentioned table. Where fec was present in a soil layer, the RAW value was increased depending on the texture. \cite{Meissner04} showed that taking into account the 1N HCl soil carbonate reaction improved estimates of parameters of the Campbell and van Genuchten soil moisture release models \citep{Campbell74, Genuchten80} for soils with high carbonate levels. Analyses of the data reported by \cite{Cock85}, which included soil data from the Barossa Valley and Adelaide Hills regions of South Australia, by \cite{Kew04} indicated that field texture classes of light sandy clay loam (LSCL) and sandy clay loam (SCL) with a very high reaction (V) to 1N HCl increased RAW by 14 mm/m compared to the average RAW of the Nil(N), Slight(S), Medium(M) and High(H) categories of the same soil texture. The Barossa Valley and Adelaide Hills soils are higher in clay content and lower in fec and probably skewed the analysis compared to that done only using the data from the lighter textured and higher fec content of the Mallee highland soils.\\
+ 
+ This paper re-examined the analysis of \cite{Kew04} and analysed the effect of fec on highland Mallee soils only and derived a diagnostic key to determine the  available water of irrigated Mallee soils using field assessed texture grade and 1N HCl reaction test.\\
+
+\section*{Methods}
+There were \Sexpr{nrow(Soils)} sample of soils taken from the Riverland (\Sexpr{nrow(subset(Soils, Region=='Riverland'))} samples), Barossa Valley and Adelaide Hills (\Sexpr{nrow(subset(Soils, Region=='Barossa'))}) regions of South Australia, and the Sunraysia (\Sexpr{nrow(subset(Soils, Region=='Sunraysia'))}) region of Victoria. Samples were taken of soil layers from the surface to a depth of 1.5m. The measurement of moisture retention characteristics was described in detail by \cite{Cock84}. Briefly, moisture retention values were determined at -2, -5, -10, -20, -70 and -1500 kPa suction using the method of \cite{McIntyre74}. These values were plotted and the moisture retention values at suctions of -8 and -60 kPa were interpolated from the curves fitted with a rubber spline. Determining field textures and soil carbonate content were described by \cite{Kew04}. The presence of fine earth carbonates were determined by the amount of effervescence in reaction to drops of 1N HCl in soil on a five category rating as described by \cite{Kew04}.\\
+
+Statistical analyses were done with the GPL package R \citep{RCore2016} version \Sexpr{getRversion()} and earlier versions. Analysis of variance on the depth of available water for matric suction ranges -8 -- -60 kPa(RAW) and -8 -- -1500 kPa (TAW) was carried out on the Mallee soil dataset. Classification and regression trees (CART) or recursive partitioning analysis with conditional inference function \textit{ctree} of the R--package \textbf{partykit} \citep{Hothorn15} was used to derive a diagnostic key that grouped soils into similar average water holding capacities. Conditional inference recursive partitioning overcomes the problem of over-fitting and biased selection of splitting variables of traditional CART algorithms by use of statistical tests \citep{Hothorn06}. \\
+
+The training dataset was derived by randomly sampling, without replacement, eighty percent of the individual samples from the Mallee dataset; the remaining 20\% of data was used as the test dataset. RAW and TAW (available water) trees were derived from the training dataset by the conditional inference procedure, which were then used to predict the RAW and TAW of the test dataset. The predicted availabe water was compared to the actual available water of the test data by calculating the mean sum of squared differences (MSS). Two thousand five hundred (2,500) iterations of the above procedure were executed and the minimum MSS derived. This procedure was repeated with about a 100 different random seeds to obtain a seed which gave a MSS, for the 2,500 iterations of either the RAW or TAW data, that was the least for the 100 seeds. The derived partitioned tree at this minimum MSS was used to specify the decision rules to place a soil into one of the RAW and TAW groups. Analysis of variance was calculated to test whether each of the RAW or TAW groups derived were sufficiently distinct to estimate available water from field data.
+     
+\section*{Results}
+\paragraph*{General fine earth carbonate properties of the soils} The field texture of Riverland and Sunraysia, Barossa and Adelaide Hills soils varied from sand to light sandy clay loam to clay with the amount of sand in the soil sample ranging from \Sexpr{min(Soils$Sand)} to \Sexpr{max(Soils$Sand)}\% and amount of clay from \Sexpr{min(Soils$Clay)} to \Sexpr{max(Soils$Clay)}\%. The sand and clay content of the Mallee soils (Riverland and Sunraysia soils) were  respectively \Sexpr{min(mallee$Sand)} to \Sexpr{max(mallee$Sand)}\% and \Sexpr{min(mallee$Clay)} to \Sexpr{max(mallee$Clay)}\%. The average $\pm$sd of carbonate in all soils for the 1N HCl reaction classes are shown in Table \ref{tab01} below. Average percent fec increased with clay content and amount of 1N HCl effervescence (Table \ref{tab02}). There was no high reaction class (H) for sand and very high reaction class (V) was not observed for sand and loamy sand field textures.
+
+<<table01, results='asis'>>=
+# calculate means
+aveco3 <- aggregate(Carbonate*100~Field.CO3, mallee, mean)
+names(aveco3)[2] <- "pctCO3"
+
+# calculate sds
+sdco3 <-  aggregate(Carbonate*100~Field.CO3, mallee, sd, na.rm=T)
+names(sdco3)[2] <- "pctCO3"
+
+# construct carbonate table
+reaction <- c('Nil','Slight','Medium','High','Very High')
+df.fec <- data.frame(reaction, aveco3[,2], sdco3[,2])
+names(df.fec) <- c("1N HCL reaction", "Average(%)", " \\pm sd(%)")
+fecTab <- xtable(df.fec, caption="Average fine earth carbonate content (\\%) for each of the 1N HCl reaction class of Mallee soils", label="tab01", align='llcc', display=c("s","s","G","g"), digits=3)
+print(fecTab, caption.placement="top", include.rownames=FALSE, floating=TRUE, tabular.environment="tabular")
+
+textbyco3 <- with(mallee, tapply(Carbonate*100, list(Field.CO3, Field.Texture), mean, na.rm=T))
+txtbyco3 <- data.frame(textbyco3)
+rownames(txtbyco3) <- reaction
+txtbyco3.tab <- xtable(txtbyco3.df, caption="Average percent fine earth carbonate content of field texture grades for each 1N HCl reaction class of Mallee soils", label="tab02", align="lrrrrrrr", digits=2)
+print(txtbyco3.tab, caption.placement="top", include.rownames=TRUE, floating=TRUE, tabular.environment="tabular")
+@                                     
+
+Soil water holding capacity varied with the field texture grades and was affected by the amount of fec in the soil with higher amounts of it increasing the water holding capacity of the soil for -8 -- -60 (RAW) and - 8 -- -1500 kPa (TAW)  suctions. However, it was not consistent across all field texture grades as shown in Figure \ref{fig01} for total water holding capacity (8--1500 kPa). Only Barossa soils were represented by the single bar for the loam texture grade (L) and there were no V category for texture grades S, LS and L. \\
+
+% plot water holding capacity 8 - 60kPa
+\begin{figure}[ht]
+
+<<allSoils, results='asis', echo=FALSE, warnings=FALSE>>= 
+theme_set(theme_classic())
+
+# first all soils
+ave60 <- aggregate(raw60~Field.Texture+Field.CO3, data=soils, FUN=mean, na.rm=T)
+mtabs.60a <- round(with(ave60, tapply(raw60, list(Field.Texture, Field.CO3), sum)), 1)
+sd60 <- aggregate(raw60~Field.Texture+Field.CO3, data=soils, FUN=sd, na.rm=T)
+stabs.60a <- round(with(sd60, tapply(raw60, list(Field.Texture, Field.CO3), sum)), 1)
+freq60 <- with(soils, tapply(raw60, list(Field.Texture, Field.CO3), length))
+
+setabs.60a <- round(stabs.60a/freq60, 2)
+
+ave15 <- matrix(nrow=8, ncol=2)
+rownames(ave15) <- rownames(mtabs.60a)
+colnames(ave15) <- c("NSMH","V")
+se15 <- ave15
+
+for (i in 1:8) {
+  ave15[i,1] <- round(mean(mtabs.60a[i,1:4], na.rm=T), 1)
+  ave15[i,2] <- round(mtabs.60a[i,5], 1)
+  se15[i,1]  <- round(mean(setabs.60a[i,1:4], na.rm=T), 2)
+  se15[i,2]  <- round(setabs.60a[i,5], 2)
+  }
+  
+RAW <- melt(ave15, varnames=c("texture","carbonate"), value.name="Raw")
+RAW.se <- melt(se15, varnames=c("texture","carbonate"), value.name="se")
+RAW <- merge(RAW,RAW.se)
+
+p1 <- ggplot(RAW, aes(x=texture, y=Raw, fill=carbonate)) + geom_bar(position="dodge", stat="identity", colour="black") + geom_errorbar(aes(ymin=Raw-se, ymax=Raw+se),  width=.2, position=position_dodge(.9)) + xlab("Field texture grade") + ylab("Readily available water (mm/m)") + scale_fill_brewer(palette="Greys") + labs(fill="1N HCl\ncarbonate\nreaction")
+p2 <- theme(legend.position = "none", legend.title=element_text(size=16, hjust=0.5), legend.text=element_text(size=14), legend.title.align=0) 
+p3 <- theme(axis.title.x = element_text(face="bold", colour="black", size=20), axis.text.x = element_text(vjust=0.5, size=16)) + theme(axis.title.y = element_text(face="bold", colour="black", size=20), axis.text.y = element_text(vjust=0.5, size=16))
+p1+p2+p3
+
+@
+
+\caption{Bar graph of readily available water (mm/m) for the four amalgamated  effervescence categories of N, S, M and H and for V category of 1N HCl test for each of the 8 field texture grades for all \Sexpr{nrow(Soils)} soils equivalent to \textit{FC-60} column of Figure 3 of \cite{Kew04}. The vertical lines with horizontal bars are $\pm$se of the mean. Shades of grey of the bars correspond to the amalgamated category (lightest grey) and V (darkest grey).}
+\label{fig01}
+\end{figure}
+
+Using the values from only Mallee soils and all five categories of 1N HCl effervescence a different picture emerges. This is illustrated in Figure \ref{fig02} for the readily available water capacity (RAW). The graphic shows that fec affects the RAW values for the sand (S), sandy loam (SL), light sandy clay loam (LSCL) and sandy clay loam (SCL) field texture grades and is variable for the other 3 field texture grades.
+
+\begin{figure}[ht]
+<<malleeSoils, results='asis', echo=FALSE>>=
+ave60 <- aggregate(raw60~Field.Texture+Field.CO3, data=mallee, FUN=mean, na.rm=T)
+mtabs.60 <- round(with(ave60, tapply(raw60, list(Field.Texture, Field.CO3), sum)), 1)
+sd60 <- aggregate(raw60~Field.Texture+Field.CO3, data=mallee, FUN=sd, na.rm=T)
+stabs.60 <- round(with(sd60, tapply(raw60, list(Field.Texture, Field.CO3), sum)), 1)
+freq60 <- with(mallee, tapply(raw60, list(Field.Texture, Field.CO3), length))
+
+setabs.60 <- round(stabs.60/freq60, 2)
+
+ave60 <- matrix(nrow=7, ncol=2)
+rownames(ave60) <- rownames(mtabs.60)
+colnames(ave15) <- c("NSMH","V")
+se15 <- ave15
+
+for (i in 1:8) {
+  ave15[i,1] <- round(mean(mtabs.60a[i,1:4], na.rm=T), 1)
+  ave15[i,2] <- round(mtabs.60a[i,5], 1)
+  se15[i,1]  <- round(mean(setabs.60a[i,1:4], na.rm=T), 2)
+  se15[i,2]  <- round(setabs.60a[i,5], 2)
+  }
+  
+MAW <- melt(mtabs.60, varnames=c("texture","carbonate"), value.name="Raw")
+MAW.se <- melt(setabs.60, varnames=c("texture","carbonate"), value.name="se")
+MAW <- merge(MAW,MAW.se)
+
+# define color ranges
+browns <- brewer.pal(9, "YlOrBr")
+blues <- brewer.pal(9, "Blues")[c(4:8)]
+greys <- brewer.pal(9, "Greys")[c(1:8)]
+
+p4 <- ggplot(MAW, aes(x=texture, y=Raw, fill=carbonate)) + geom_bar(position="dodge", stat="identity", colour="black") + geom_errorbar(aes(ymin=Raw-se, ymax=Raw+se),  width=.2, position=position_dodge(.9)) + xlab("Field Texture grade") + ylab("Readily Available Water (mm/m)") + scale_fill_manual(values=blues) + labs(fill="Field\ntexture\ngrade")
+p5 <- theme(legend.position = "none", legend.title=element_text(size=16, hjust=0.5), legend.text=element_text(size=14), legend.title.align=0)
+p6 <- theme(axis.title.x = element_text(face="bold", colour="black", size=20), axis.text.x = element_text(vjust=0.5, size=16)) + theme(axis.title.y = element_text(face="bold", colour="black", size=20), axis.text.y = element_text(vjust=0.5, size=16))
+p4 + p5  + p6
+@
+\caption{Bar graph of readily available water (RAW) for each of the five 1N HCl effervescence categories and seven field texture grades of the \Sexpr{nrow(mallee)} Mallee soils. The five 1N HCl effervescence categories are represented by grey bars from lighest (N category) to darkest (V). The vertical lines with horizontal bars are $\pm$se of the mean.}
+\label{fig02} 
+\end{figure}
+%\clearpage
+ 
+<<linmod, results='asis', echo=FALSE>>=
+#calculate raw2 8 - 60kPa and taw = 8kPa - 1500 kPa
+mallee$raw2 <- with(mallee, (KPa8-KPa60)* 1000)
+mallee$taw <- with(mallee, (KPa8 - KPa1500)*1000)
+
+#================ analyse for raw60 - 8 - 60 kPa ======================
+#
+# linear regression on each hand texture class
+
+# Field texture is S
+Sands <- subset(mallee, Field.Texture=="S")
+Sands$Field.CO3 <- factor(Sands$Field.CO3, levels=c("N", "S", "M"), ordered=T)
+contrasts(Sands$Field.CO3) <- contr.treatment(3)
+sand.lm02 <- lm(raw60^(13/10)~Field.CO3, data=Sands)
+
+# Field texture is LS
+LSand <- subset(mallee, Field.Texture=="LS")
+LSand$Field.CO3 <- factor(LSand$Field.CO3, levels=c("N", "S", "M", "H"), ordered=T)
+contrasts(LSand$Field.CO3) <- contr.treatment(4)
+loamysand.lm02 <- lm(raw60^(3.6/10)~Field.CO3, data=LSand)
+
+# Field texture is SL
+SandL <- subset(mallee, Field.Texture=="SL")
+contrasts(SandL$Field.CO3) <- contr.treatment(5)
+sandyloam.lm02 <- lm(raw60^(-2.2/10)~Field.CO3, data=SandL)
+
+# Field texture is LSCL
+LSCLoam <- subset(mallee, Field.Texture=="LSCL")
+contrasts(LSCLoam$Field.CO3) <- contr.treatment(5)
+lscl.lm02 <- lm(raw60^(4.5/10)~Field.CO3, data=LSCLoam)
+
+# Field texture is SCL
+SCLoam <- subset(mallee, Field.Texture=="SCL")
+contrasts(SCLoam$Field.CO3) <- contr.treatment(5)
+scloam.lm02 <- lm(raw60^(-3.7/10)~Field.CO3, data=SCLoam)
+
+# Field texture is CL
+ClayLoam <- subset(mallee, Field.Texture=="CL")
+contrasts(ClayLoam$Field.CO3) <- contr.treatment(5)
+clayloam.lm02 <- lm(raw60^(7.7/10)~Field.CO3, data=ClayLoam)
+
+# Field texture is C
+Clay <- subset(mallee, Field.Texture=="C")
+contrasts(Clay$Field.CO3) <- contr.treatment(5)
+clay.lm02 <- lm(raw60^(11.4/10)~Field.CO3, data=Clay)
+
+# All Field textures 
+contrasts(mallee$Field.CO3) <- cbind(c(-4,1,1,1,1),c(0,-3,1,1,1),c(0,0,-2,1,1),c(0,0,0,-1,1)) #contr.treatment(5)
+contrasts(mallee$Field.Texture) <- contr.treatment(7)
+alltext.lm02 <- lm(raw60^(3/10)~Field.Texture/Field.CO3, data=mallee)
+fstats <- summary(alltext.lm02)$'fstatistic'
+@
+
+\paragraph*{Analysis of Variance} Analysis of variance of the Mallee soils dataset for readily available water (RAW) showed a strong interaction effect between field texture and reaction test (F-value=\Sexpr{signif(anova(alltext.lm02)$"F value"[2], 3)} on \Sexpr{anova(alltext.lm02)$"Df"[2]} and \Sexpr{anova(alltext.lm02)$"Df"[3]} degrees of freedom with Pr(>F)=\Sexpr{signif(anova(alltext.lm02)$"Pr(>F)"[1], 3)}). However, only sand and light sandy clay loam were significant for all relevant carbonate reaction classes. For instance, for sand texture grade there was a significant increase in RAW between N reaction and S reaction classes (Pr(>|t|)=\ensuremath{2.68\times 10^{-3}}). There were similar variable interaction patterns with the other texture grades and reaction classes. Individual regression analyses of individual texture grades revealed that there was an increase in RAW as reaction class increased for S(F-value=\Sexpr{signif(anova(sand.lm02)$"F value"[1], 3)} on \Sexpr{anova(sand.lm02)$"Df"[1]} and \Sexpr{anova(sand.lm02)$"Df"[2]} degrees of freedom with Pr(>F)=\Sexpr{signif(anova(sand.lm02)$"Pr(>F)"[1], 3)}), LS(F-value=\Sexpr{signif(anova(loamysand.lm02)$"F value"[1], 3)} on \Sexpr{anova(loamysand.lm02)$"Df"[1]} and \Sexpr{anova(loamysand.lm02)$"Df"[2]} degrees of freedom with Pr(>F)=\Sexpr{signif(anova(loamysand.lm02)$"Pr(>F)"[1], 2)}), LSCL(F-value=\Sexpr{signif(anova(lscl.lm02)$"F value"[1], 3)} on \Sexpr{anova(lscl.lm02)$"Df"[1]} and \Sexpr{anova(lscl.lm02)$"Df"[2]} degrees of freedom with Pr(>F)=\Sexpr{signif(anova(lscl.lm02)$"Pr(>F)"[1], 3)}) and SCL(F-value=\Sexpr{signif(anova(scloam.lm02)$"F value"[1], 3)} on \Sexpr{anova(scloam.lm02)$"Df"[1]} and \Sexpr{anova(scloam.lm02)$"Df"[2]} degrees of freedom with Pr(>F)=\Sexpr{signif(anova(scloam.lm02)$"Pr(>F)"[1], 3)}). Results of regression analyses for the total available moisture categories showed similar pattern of results.
+
+\paragraph*{Conditional inference tree analyses} 
+\subparagraph*{Readily Available Water} The conditional inference tree analysis of the readily available water (RAW) produced a tree with five terminal leaves\footnote{R--package \textit{ctree} the control parameters were: teststat="quad", testtype="Bonferroni", mincriterion=0.97} (Figure \ref{fig03}). The respective mean$\pm$sd of the 5 groups were from left to right: \Sexpr{round(aveRaw[1],0)}$\pm$\Sexpr{round(sdRaw[1],0)}, \Sexpr{round(aveRaw[2],0)}$\pm$\Sexpr{round(sdRaw[2],0)}, \Sexpr{round(aveRaw[3],0)}$\pm$\Sexpr{round(sdRaw[3],0)}, \Sexpr{round(aveRaw[4],0)}$\pm$\Sexpr{round(sdRaw[4],0)} and \Sexpr{round(aveRaw[5],0)}$\pm$\Sexpr{round(sdRaw[5],0)} mm/m. Analysis of variance test of the five groups showed that there were significant differences between the RAW values of the 5 groups.
+
+<<cart.raw, results='asis', echo=FALSE, warnings=FALSE>>=
+# store the number of rows in the mallee dataframe
+nrows <- nrow(mallee)
+
+# test using conditional partioning
+set.seed(632087)
+# randomly sample 80% of dataset without replacement
+for (i in 1:2500){
+  rows <- sample(1:nrows, floor(0.8*nrows))
+  train <- mallee[rows, c('raw60','Field.CO3', 'Field.Texture')]
+  test <-  mallee[-rows, c('raw60','Field.CO3', 'Field.Texture')]
+
+# derive regression tree
+  raw.ct <- ctree(raw60 ~ Field.Texture + Field.CO3, data=train, control=ctree_control(teststat="quad", testtype="Bonferroni", mincriterion=0.97))
+  test$pred <- predict(raw.ct, newdata=test)
+  Raw.tab <- with(test, tapply(raw60, list(Field.Texture, Field.CO3), mean, na.rm=T))
+  pred.tab <- with(test, tapply(pred, list(Field.Texture, Field.CO3), mean, na.rm=T))
+  Nobs= sum(!is.na(Raw.tab-pred.tab))
+  sumsq <- sum((Raw.tab-pred.tab)^2, na.rm=T)
+  sumsq <- sumsq/Nobs
+
+  # on first iteration save regression tree information in min & max variables
+  if (i==1) {
+    minsumsq <- sumsq
+    mintrain <- train
+    mintest <- test
+    minraw.ct <- raw.ct
+    min.i <- 1
+    }
+    
+  # save regression tree information in min & max variables as appropriate
+    else {
+    if (sumsq < minsumsq) {
+      minsumsq <- sumsq
+      mintrain <- train
+      mintest <- test
+      minraw.ct <- raw.ct
+      min.i <- i
+      }
+    }
+  }
+@
+
+\begin{figure}
+\centering
+
+<<raw_tree, results='asis', echo=FALSE>>=
+# save terminal nodes names to dataframe
+nodes <- predict(minraw.ct, newdata=mallee, type="node")
+mallee$rawclass <- ifelse(nodes==3, "Node03", 
+  ifelse(nodes==4, "Node04", 
+    ifelse(nodes==6, "Node06",
+      ifelse(nodes==8, "Node08","Node09"))))
+mallee$rawclass <- factor(mallee$rawclass)
+
+# save terminal nodes names to dataframe
+nodes <- predict(minraw.ct, newdata=mallee, type="node")
+mallee$rawclass <- ifelse(nodes==3, "Node03", 
+  ifelse(nodes==4, "Node04", 
+    ifelse(nodes==6, "Node06",
+      ifelse(nodes==8, "Node08","Node09"))))
+mallee$rawclass <- factor(mallee$rawclass)
+#with(mallee, tapply(raw60, rawclass, mean, na.rm=T))
+
+raw_sp1 <- partysplit(2L, breaks=3)
+raw_sp2 <- partysplit(3L, breaks = 1)
+raw_sp3 <- partysplit(3L, breaks = 5)
+raw_sp4 <- partysplit(3L, breaks = 6)
+
+raw_node <- partynode(1L, split=raw_sp1, kids=list(
+  partynode(2L, split=raw_sp2, kids=list(
+    partynode(3L, info="39mm"),
+    partynode(4L, info="59mm"))),
+  partynode(5L, split=raw_sp3, kids=list(
+    partynode(6L, info="78mm"),
+    partynode(7L, split=raw_sp4, kids=list(
+      partynode(8L, info="67mm"),
+      partynode(9L, info="56mm")))))))
+
+# extract subset of mallee dataframe, rename variables and rename Reaction levels
+# then refactor
+mallee.r <- mallee[, c('raw60','Field.CO3', 'Field.Texture', 'rawclass')] 
+names(mallee.r) <- c('Moisture','Reaction','Texture','RAW')
+mallee.r$Reaction <- with(mallee.r, ifelse(Reaction=='N','Nil', 
+  ifelse(Reaction=='S', 'Slight',
+    ifelse(Reaction=='M', 'Medium',
+      ifelse(Reaction=='H', 'High','Very High')))))
+mallee.r$Reaction <- factor(mallee.r$Reaction, levels=c('Nil','Slight','Medium','High','Very High'), ordered=TRUE)
+
+# rename Texture and refactor
+mallee.r$Texture <- with(mallee.r, ifelse(Texture=='S','Sand', 
+  ifelse(Texture=='LS','Loamy Sand',
+    ifelse(Texture=='SL', 'Sandy Loam',
+      ifelse(Texture=='LSCL', 'Light Sandy Clay Loam',
+        ifelse(Texture=="SCL", 'Sandy Clay Loam',
+          ifelse(Texture=='CL', 'Clay Loam', 'Clay')))))))
+mallee.r$Texture <- factor(mallee.r$Texture, levels=c('Sand','Loamy Sand','Sandy Loam','Light Sandy Clay Loam','Sandy Clay Loam','Clay Loam','Clay'), labels=c('Sand','Loamy Sand','Sandy Loam','Light Sandy\n Clay Loam','Sandy\n Clay Loam','Clay Loam','Clay'), ordered=TRUE)
+
+# rename RAW and refactor
+mallee.r$RAW <- with(mallee.r, ifelse(RAW=="Node03", "RAW01",
+   ifelse(RAW=="Node04", "RAW02",
+     ifelse(RAW=="Node06", "RAW03",
+       ifelse(RAW=="Node08", "RAW04", 'RAW05')))))
+mallee.r$RAW <- factor(mallee.r$RAW, ordered=TRUE)
+
+raw_pty <- party(raw_node, mallee.r)
+plot(raw_pty, terminal_panel=node_terminal(raw_pty, fill="light blue"), inner_panel=node_inner(raw_pty, fill="grey"))
+
+aveRaw <- with(mallee.r, tapply(Moisture, RAW, mean, na.rm=T))
+sdRaw  <- with(mallee.r, tapply(Moisture, RAW, sd, na.rm=T))
+contrasts(mallee.r$RAW) <- cbind(c(-4,1,1,1,1), c(0,-3,1,1,1), c(0,0,-2,1,1), c(0,0,0,-1,1))
+raw.lm01 <- lm(Moisture~RAW, data=mallee.r)
+fstats.raw <- summary(raw.lm01)$'fstatistic'
+@
+\caption{Decision tree for deriving readily available soil moisture holding capacity-- RAW -- (-8 -- -60kPa suction) of highland Mallee soils in the Riverland, South Australia and Sunraysia, Victoria regions. The root of the tree is split on the basis of 1N HCl reaction class M --- left branch soils with nil (N), slight (S) or medium (M) reaction, right branch soils with high (H) or very high (V) reaction classes. Boxes at end of tree branches (leaves) are RAW depths(mm/m).}
+\label{fig03}
+\end{figure}
+\clearpage
+
+The interpretation of Figure \ref{fig03} is: beginning at the root node, the left branch is all soils with nil (N), slight (S) or medium (M) 1N HCl reaction classes and to the right all soils with reaction classes of high (H) or very high (V). At node 2, are soils with field texture of sand to the left and to the right all other textures, principally loamy sand, sandy loam and light sandy clay loam. On the right hand side starting from node 5 the division is on soils with textures of sandy clay loam or lighter to the left and to the right clay loam or clay which is split at node 7 into clay loam to the left and clay to the right.\\
+
+Including the Barossa soils in the conditional inference tree analysis resulted in a tree with 4-terminal leaves. The first terminal leaf included all the soils with reaction classes N, S and M compared to the Mallee --- only soils where there was a breakdown based on field texture of sand or more clayey than sand. The other three leaves where similar to the Mallee--only tree. The average RAW values $\pm$sd, which included the Barossa soils, were \Sexpr{round(soils.raw[[1]],0)}$\pm$\Sexpr{round(soils.rawsd[[1]],0)}, \Sexpr{round(soils.raw[[2]],0)}$\pm$\Sexpr{round(soils.rawsd[[2]],0)}, \Sexpr{round(soils.raw[[3]],0)}$\pm$\Sexpr{round(soils.rawsd[[3]],0)} and \Sexpr{round(soils.raw[[4]],0)}$\pm$\Sexpr{round(soils.rawsd[[4]],0)} mm/m. 
+
+
+\section*{Discussion}
+Riverland and Sunraysia Mallee soils of the highland contain fine earth carbonates (fec) ranging from  about 0.5\% to 18.5\% in the soil profile. Visual inspection of the data (Figure \ref{fig02}) indicates that the presence of varying amounts of fec appears to increase the water holding capacity of the soils. This is supported by statistical analysis that shows there is an interaction between field aseessed texture grade and 1N HCl reaction class and that fec mostly affects field textures of light sandy clay loam or lighter. The individual analysis for each field texture grade revealed that the increase was not consistent across the 1N HCl reation test classes. \\
+
+Comparing this result with that of \cite{Kew2004} showed that the addition of the Barossa and Adelaide Hills soils 
+
+On the basis of the above result, it was felt that a classification and regression tree (CART) approach was worth examining to see if a decision tree could be derived 
+
+\section*{Conclusions}
+
+\newpage             
+\section*{Acknowledgements}
+
+\begin{thebibliography}{100}
+\bibitem[Campbell (1974)]{Campbell74} Campbell, G.S. (1974) \textit{A simple method for determining unsaturated conductivity from moisture retention data.} Soil Science \textbf{117} 311--314
+                         
+\bibitem[Cock(1985)]{Cock85} Cock, G.J. (1985) Moisture characteristics of irrigated Mallee soils in South Australia. \textit{Australian Journal of Experimental Agriculture} \textbf{25(1)} 209--213
+
+\bibitem[Cock(1984)]{Cock84} Cock, G.J. (1984) Moisture characteristics of irrigated Mallee soils. Technical Paper No. 5, Department of Agriculture, South Australia ISBN-0-7243-6406 4
+
+\bibitem[Cole(1985)]{Cole85} Cole, P.J. (Ed)(1985) \textit{RMISIP report : the River Murray Irrigation and Salinity Investigation Programme : results and future directions.} South Australia. Dept. of Agriculture Technical report no. 69
+
+\bibitem[Hothorn and Zeileis(2015)]{Hothorn15} Hothorn, Torsten and Zeileis, Achim (2015). \textit{partykit: A Modular Toolkit for  Recursive Partytioning in R.} Journal of Machine Learning Research, \textbf{16} 3905--3909. \url{http://jmlr.org/papers/v16/hothorn15a.html}
+
+\bibitem[Hothorn et.al(2006)]{Hothorn06} Hothorn, Torsten, Hornik, Kurt and Zeileis,  Achim(2006). \textit{Unbiased Recursive Partitioning: A Conditional Inference Framework.} Journal of Computational and Graphical Statistics, \textbf{15(3)} 651---674.
+
+\bibitem[Kew et.al.(2004)]{Kew04} Kew Geoff, Wetherby Ken, Zimmermann Tony and Meissner Tony (2004) Estimation of readily available waterholding capacity using field hand texture. \textit{SuperSoil 2004: 3rd Australian New Zealand Soils Conference, 5 – 9 December 2004, University of Sydney, Australia.} \url{http://www.regional.org.au/au/pdf/asssi/supersoil2004/1427_kew.pdf}
+
+\bibitem[Khodaverdiloo et.al(2011)]{Khoda11} Khodaverdiloo, H., Homaee, M., van Genuchten, M., \& Dashtaki, S. (2011). \textit{Deriving and validating pedotransfer functions for some calcareous soils.} Journal of Hydrology, \textbf{399(1)}, 93--99.
+
+\bibitem[McIntyre(1974)]{McIntyre74} McIntyre, D.S. Laboratory Equipment for Water Retention Studies in \textit{Methods for Analysis of Irrigated Soils} Commonwealth Agricultural Bureaux Technical Bulletin No. 55 162--171
+
+\bibitem[Meissner(2004)]{Meissner04} Meissner Tony (2004) Relationship between soil properties of Mallee soils and parameters of two moisture characteristics models. \textit{SuperSoil 2004: 3rd Australian New Zealand Soils Conference, 5 – 9 December 2004, University of Sydney, Australia.}  \url{http://www.regional.org.au/au/pdf/asssi/supersoil2004/2018_meissnert.pdf}
+
+\bibitem[R Development Core Team(2016)]{RCore2016} R Development Core Team, 2016. R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-900051-07-0, \url{http://www.R-project.org}.
+
+\bibitem[Wetherby and Oades (1975)]{Wetherby75} Classification of carbonate layers in highland soils  of the Northern Murray Mallee, S.A. and their use in stratigraphic and land use studies. \textit{Australian Journal of Soil Research} \textbf{13 (2)} 119--132
+
+\bibitem[van Genuchten (1980)]{Genuchten80} Van Genuchten MTh. (1980) \textit{A closed-form equation for predicting the hydraulic conductivity of
+unsaturated soils.} Soil Sci. Soc. Am. J. \textbf{43} 892--898
+\end{thebibliography}
+
+\end{sffamily}
+\end{document}
+
+
