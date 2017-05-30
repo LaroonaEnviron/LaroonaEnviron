@@ -30,7 +30,7 @@ summary(mall.modc)
 
 # Hierarchical kmeans clustering
 require(factoextra)
-mallee.hk <- hkmeans(mall_sc, 7)
+mallee.hk <- hkmeans(mall_sc, 6)
 names(mallee.hk)
 
 mallee.hk # print results
@@ -50,6 +50,7 @@ fviz_cluster(list(data=mall_sc, cluster=mallee.hk$cluster),
   labelsize = 6,
   main="Heirarchical Cluster - kmeans"
   )
+
 
 # conditional regression trees
 require(rpart)
